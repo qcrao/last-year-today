@@ -37,16 +37,19 @@ export class RoamService {
    * Mark historical page windows with custom attribute
    */
   static markHistoricalWindows() {
-    // setTimeout(() => {
-    //   const windows = document.querySelectorAll(".rm-article-wrapper");
-    //   windows.forEach((window) => {
-    //     const title = window.querySelector(
-    //       ".rm-title-display span"
-    //     )?.textContent;
-    //     if (title && title.includes(",") && /\d{4}/.test(title)) {
-    //       window.setAttribute("data-last-year-today", "true");
-    //     }
-    //   });
-    // }, 500);
+    setTimeout(() => {
+      console.log("marking historical windows");
+      const windows = document.querySelectorAll(".rm-sidebar-outline");
+      console.log(windows);
+      windows.forEach((window) => {
+        const title = window.querySelector(
+          ".rm-title-display span"
+        )?.textContent;
+        console.log(title);
+        if (title && title.includes(",") && /\d{4}/.test(title)) {
+          window.setAttribute("data-last-year-today", "true");
+        }
+      });
+    }, 500);
   }
 }
