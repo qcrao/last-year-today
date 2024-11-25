@@ -5,6 +5,7 @@ import { DateUtils } from "./utils/dateUtils";
 import { loadInitialSettings, initPanelConfig, yearsBack } from "./settings";
 
 let cleanupObserver: (() => void) | null = null;
+let midnightTimer: NodeJS.Timer | null = null;
 
 const openHistoricalPages = async (today: string) => {
   const historicalPages = await HistoricalPagesService.getHistoricalPages(
@@ -36,6 +37,22 @@ const openHistoricalPages = async (today: string) => {
   }
 };
 
+const scheduleNextMidnight = () => {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+
+  const timeUntilMidnight = tomorrow.getTime() - now.getTime();
+
+  return setTimeout(async () => {
+    const today = DateUtils.formatRoamDate(new Date());
+    await openHistoricalPages(today);
+    // Schedule next midnight
+    midnightTimer = scheduleNextMidnight();
+  }, timeUntilMidnight);
+};
+
 const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
   console.log("Last Year Today plugin loading...");
 
@@ -54,6 +71,9 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
     const today = DateUtils.formatRoamDate(now);
 
     await openHistoricalPages(today);
+
+    // Schedule next midnight update
+    midnightTimer = scheduleNextMidnight();
   } catch (error) {
     console.error("Error loading Last Year Today plugin:", error);
   }
@@ -70,6 +90,12 @@ const onunload = () => {
   if (cleanupObserver) {
     cleanupObserver();
     cleanupObserver = null;
+  }
+
+  // Clear midnight timer
+  if (midnightTimer) {
+    clearTimeout(midnightTimer);
+    midnightTimer = null;
   }
 
   console.log("Last Year Today plugin unloaded!");
