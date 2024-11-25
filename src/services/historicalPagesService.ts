@@ -11,10 +11,18 @@ export class HistoricalPagesService {
     currentDateStr: string,
     yearsBack: number
   ): Promise<HistoricalPage[]> {
+    console.log("Getting historical pages for", currentDateStr, yearsBack);
+
+    if (yearsBack < 1) {
+      yearsBack = 1;
+    } else if (yearsBack > 5) {
+      yearsBack = 5;
+    }
+
     const currentDate = DateUtils.parseEnglishDate(currentDateStr);
     const pages: HistoricalPage[] = [];
 
-    for (let i = 1; i <= yearsBack; i++) {
+    for (let i = 1; i < yearsBack; i++) {
       const historicalDate = new Date(currentDate);
       historicalDate.setFullYear(currentDate.getFullYear() - i);
 

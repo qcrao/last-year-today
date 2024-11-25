@@ -2,13 +2,14 @@
 import { HistoricalPagesService } from "./services/historicalPagesService";
 import { RoamService } from "./services/roamService";
 import { DateUtils } from "./utils/dateUtils";
+import { loadInitialSettings, initPanelConfig, yearsBack } from "./settings";
 
 let cleanupObserver: (() => void) | null = null;
 
 const openHistoricalPages = async (today: string) => {
   const historicalPages = await HistoricalPagesService.getHistoricalPages(
     today,
-    5
+    yearsBack
   );
 
   if (historicalPages.length > 0) {
@@ -35,10 +36,16 @@ const openHistoricalPages = async (today: string) => {
   }
 };
 
-const onload = async () => {
+const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
   console.log("Last Year Today plugin loading...");
 
   try {
+    // Load settings
+    await loadInitialSettings(extensionAPI);
+
+    // Initialize panel config
+    await extensionAPI.settings.panel.create(initPanelConfig(extensionAPI));
+
     // Initialize custom styles
     RoamService.injectCustomStyles();
 
