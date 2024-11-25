@@ -43,19 +43,31 @@ export class RoamService {
    * Mark historical page windows with custom attribute
    */
   static markHistoricalWindows() {
-    setTimeout(() => {
-      console.log("marking historical windows");
+    // Initial marking
+    const markWindows = () => {
       const windows = document.querySelectorAll(".rm-sidebar-outline");
-      console.log(windows);
       windows.forEach((window) => {
         const title = window.querySelector(
           ".rm-title-display span"
         )?.textContent;
-        console.log(title);
         if (title && title.includes(",") && /\d{4}/.test(title)) {
           window.setAttribute("data-last-year-today", "true");
         }
       });
-    }, 500);
+    };
+
+    // Create observer to watch for DOM changes
+    const observer = new MutationObserver((mutations) => {
+      markWindows();
+    });
+
+    // Start observing with configuration
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    // Initial marking
+    markWindows();
   }
 }
