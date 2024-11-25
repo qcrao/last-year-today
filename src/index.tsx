@@ -41,6 +41,34 @@ const openHistoricalPages = async (today: string) => {
   }
 };
 
+const closeHistoricalPages = async (today: string) => {
+  const historicalPages = await HistoricalPagesService.getHistoricalPages(
+    today,
+    yearsBack
+  );
+
+  // Check if rightSidebar API exists before using it
+  const roamAPI = window as any;
+  if (!roamAPI?.roamAlphaAPI?.ui?.rightSidebar) {
+    console.error("Right sidebar API not available");
+    return;
+  }
+
+  // Close windows for each historical page
+  for (const page of historicalPages) {
+    try {
+      await roamAPI.roamAlphaAPI.ui.rightSidebar.removeWindow({
+        window: {
+          type: "outline",
+          "block-uid": page.uid
+        }
+      });
+    } catch (error) {
+      console.error(`Failed to close window for page ${page.uid}:`, error);
+    }
+  }
+};
+
 const scheduleNextMidnight = () => {
   const now = new Date();
   const tomorrow = new Date(now);
@@ -70,7 +98,11 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
     // Initialize panel config
     await extensionAPI.settings.panel.create(initPanelConfig(extensionAPI));
 
-    await loadRoamExtensionCommands(extensionAPI, openHistoricalPages);
+    await loadRoamExtensionCommands(
+      extensionAPI,
+      openHistoricalPages,
+      closeHistoricalPages
+    );
 
     // Initialize custom styles
     RoamService.injectCustomStyles();
