@@ -50,7 +50,9 @@ export class RoamService {
         const title = window.querySelector(
           ".rm-title-display span"
         )?.textContent;
-        if (title && title.includes(",") && /\d{4}/.test(title)) {
+        const dateRegex =
+          /(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2}(?:st|nd|rd|th)?,\s+\d{4}/i;
+        if (title && dateRegex.test(title)) {
           window.setAttribute("data-last-year-today", "true");
         }
       });
