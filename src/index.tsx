@@ -18,6 +18,9 @@ const openHistoricalPages = async (today: string) => {
     // Open right sidebar
     await (window as any).roamAlphaAPI.ui.rightSidebar.open();
 
+    // Reverse historical pages so they are in order from oldest to newest
+    historicalPages.reverse();
+
     // Open windows for each historical page
     for (const page of historicalPages) {
       const formattedDate = DateUtils.formatRoamDate(page.date);
