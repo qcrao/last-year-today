@@ -22,13 +22,19 @@ export class RoamService {
       const style = document.createElement("style");
       style.id = styleId;
       style.textContent = `
-          .rm-sidebar-outline[data-last-year-today="true"] .rm-title-display span {
-            background-color: #FFE4B5;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 600;
-          }
-        `;
+        .rm-sidebar-outline[data-last-year-today="true"] .rm-title-display span {
+          background-color: #FFE4B5;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-weight: 600;
+        }
+        
+        /* Preserve Roam's default link styles */
+        .rm-page-ref,
+        .rm-page-ref--link {
+          color: inherit !important;
+        }
+      `;
       document.head.appendChild(style);
     }
   }

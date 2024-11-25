@@ -1,7 +1,6 @@
 // src/index.tsx
 import { HistoricalPagesService } from "./services/historicalPagesService";
 import { RoamService } from "./services/roamService";
-import "./styles/index.css";
 import { DateUtils } from "./utils/dateUtils";
 
 const onload = async () => {
