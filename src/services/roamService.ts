@@ -43,7 +43,8 @@ export class RoamService {
    * Mark historical page windows with custom attribute
    */
   static markHistoricalWindows() {
-    // Initial marking
+    let observer: MutationObserver | null = null;
+
     const markWindows = () => {
       const windows = document.querySelectorAll(".rm-sidebar-outline");
       windows.forEach((window) => {
@@ -59,7 +60,7 @@ export class RoamService {
     };
 
     // Create observer to watch for DOM changes
-    const observer = new MutationObserver((mutations) => {
+    observer = new MutationObserver((mutations) => {
       markWindows();
     });
 
@@ -71,5 +72,13 @@ export class RoamService {
 
     // Initial marking
     markWindows();
+
+    // Return cleanup function
+    return () => {
+      if (observer) {
+        observer.disconnect();
+        observer = null;
+      }
+    };
   }
 }

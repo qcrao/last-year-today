@@ -3,6 +3,8 @@ import { HistoricalPagesService } from "./services/historicalPagesService";
 import { RoamService } from "./services/roamService";
 import { DateUtils } from "./utils/dateUtils";
 
+let cleanupObserver: (() => void) | null = null;
+
 const onload = async () => {
   console.log("Last Year Today plugin loading...");
 
@@ -36,8 +38,8 @@ const onload = async () => {
         });
       }
 
-      // Mark historical windows with custom styles
-      RoamService.markHistoricalWindows();
+      // Mark historical windows with custom styles and store cleanup function
+      cleanupObserver = RoamService.markHistoricalWindows();
       console.log("Historical pages opened successfully!");
     } else {
       console.log("No historical pages found");
@@ -53,6 +55,13 @@ const onunload = () => {
   if (styleElement) {
     styleElement.remove();
   }
+
+  // Clean up observer
+  if (cleanupObserver) {
+    cleanupObserver();
+    cleanupObserver = null;
+  }
+
   console.log("Last Year Today plugin unloaded!");
 };
 
