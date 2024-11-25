@@ -27,6 +27,17 @@ export class RoamService {
           padding: 2px 6px;
           border-radius: 4px;
           font-weight: 600;
+          position: relative;
+          padding-left: 24px;
+        }
+
+        .rm-sidebar-outline[data-last-year-today="true"] .rm-title-display span::before {
+          content: "⏳";
+          position: absolute;
+          left: 4px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 14px;
         }
         
         /* Preserve Roam's default link styles */
