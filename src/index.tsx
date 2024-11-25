@@ -44,6 +44,9 @@ const scheduleNextMidnight = () => {
   tomorrow.setHours(0, 0, 0, 0);
 
   const timeUntilMidnight = tomorrow.getTime() - now.getTime();
+  console.log(
+    `Next update scheduled in ${timeUntilMidnight / 1000 / 60} minutes`
+  );
 
   return setTimeout(async () => {
     const today = DateUtils.formatRoamDate(new Date());
