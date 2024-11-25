@@ -22,7 +22,7 @@ export class RoamService {
       const style = document.createElement("style");
       style.id = styleId;
       style.textContent = `
-          .rm-article-wrapper[data-last-year-today="true"] .rm-title-display span {
+          .rm-sidebar-outline[data-last-year-today="true"] .rm-title-display span {
             background-color: #FFE4B5;
             padding: 2px 6px;
             border-radius: 4px;
