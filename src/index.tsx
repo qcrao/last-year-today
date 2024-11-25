@@ -109,8 +109,25 @@ const onload = async () => {
   console.log("Last Year Today plugin loading...");
 
   try {
-    // 获取当前页面的标题（应该是一个日期）
-    const today = "November 25th, 2024"; // 目前是硬编码，之后我们需要从 Roam 获取
+    // 获取当前日期
+    const now = new Date();
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    const today = `${months[now.getMonth()]} ${getDayWithSuffix(
+      now.getDate()
+    )}, ${now.getFullYear()}`;
 
     // 获取过去5年的页面
     const historicalPages = await getHistoricalPages(today, 5);
@@ -122,20 +139,6 @@ const onload = async () => {
       // 为每个找到的历史页面打开一个窗口
       for (const page of historicalPages) {
         const date = page.date;
-        const months = [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-          "August",
-          "September",
-          "October",
-          "November",
-          "December",
-        ];
         const formattedDate = `${months[date.getMonth()]} ${getDayWithSuffix(
           date.getDate()
         )}, ${date.getFullYear()}`;
