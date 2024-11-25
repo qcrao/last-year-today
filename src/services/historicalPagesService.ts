@@ -15,8 +15,8 @@ export class HistoricalPagesService {
 
     if (yearsBack < 1) {
       yearsBack = 1;
-    } else if (yearsBack > 5) {
-      yearsBack = 5;
+    } else if (yearsBack > 10) {
+      yearsBack = 10;
     }
 
     const currentDate = DateUtils.parseEnglishDate(currentDateStr);

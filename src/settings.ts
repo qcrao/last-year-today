@@ -12,7 +12,7 @@ export function initPanelConfig(extensionAPI: any) {
       {
         id: "years-back",
         name: "Years Back",
-        description: "Number of years to look back (default: 1)",
+        description: "Number of years to look back (default: 1, max: 10)",
         action: {
           type: "input",
           onChange: (evt: any) => {

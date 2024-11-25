@@ -3,6 +3,7 @@ import { HistoricalPagesService } from "./services/historicalPagesService";
 import { RoamService } from "./services/roamService";
 import { DateUtils } from "./utils/dateUtils";
 import { loadInitialSettings, initPanelConfig, yearsBack } from "./settings";
+import { loadRoamExtensionCommands } from "./commands";
 
 let cleanupObserver: (() => void) | null = null;
 let midnightTimer: NodeJS.Timer | null = null;
@@ -65,6 +66,8 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
 
     // Initialize panel config
     await extensionAPI.settings.panel.create(initPanelConfig(extensionAPI));
+
+    await loadRoamExtensionCommands(extensionAPI, openHistoricalPages);
 
     // Initialize custom styles
     RoamService.injectCustomStyles();
