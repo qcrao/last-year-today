@@ -22,6 +22,13 @@ export class RoamService {
       const style = document.createElement("style");
       style.id = styleId;
       style.textContent = `
+        .rm-sidebar-outline[data-last-year-today="true"] {
+          border: 2px solid #FFE4B5;
+          border-radius: 8px;
+          padding: 8px;
+          box-shadow: 0 2px 8px rgba(255, 228, 181, 0.3);
+        }
+
         .rm-sidebar-outline[data-last-year-today="true"] .rm-title-display span {
           background-color: #FFE4B5;
           padding: 2px 6px;
@@ -29,6 +36,7 @@ export class RoamService {
           font-weight: 600;
           position: relative;
           padding-left: 24px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .rm-sidebar-outline[data-last-year-today="true"] .rm-title-display span::before {
