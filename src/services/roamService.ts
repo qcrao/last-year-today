@@ -48,11 +48,7 @@ export class RoamService {
           font-size: 14px;
         }
         
-        /* Preserve Roam's default link styles */
-        .rm-page-ref,
-        .rm-page-ref--link {
-          color: inherit !important;
-        }
+       
       `;
       document.head.appendChild(style);
     }
