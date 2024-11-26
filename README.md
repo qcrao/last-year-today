@@ -2,7 +2,7 @@
 
 Last Year Today is a Roam Research extension that automatically shows you what you wrote on the same day in previous years. It helps you reflect on your past thoughts, track your progress, and rediscover valuable insights from your journal entries.
 
-![historical-pages](assets/historical-pages.png)
+![historical-pages](https://github.com/qcrao/last-year-today/blob/main/assets/historical-pages.png?raw=true)
 
 ## Features
 
@@ -42,7 +42,7 @@ After installation, configure the extension in the Roam Research settings panel:
    - Default: 9 AM
    - Range: 0-23 (24-hour format)
 
-![settings](assets/settings.png)
+![settings](https://github.com/qcrao/last-year-today/blob/main/assets/settings.png?raw=true)
 
 ## Usage
 
@@ -63,7 +63,7 @@ You can also control the extension manually through the command palette (Cmd/Ctr
    - Closes all historical page windows
    - Cleans up the sidebar
 
-![command-palette](assets/command-palette.png)
+![command-palette](https://github.com/qcrao/last-year-today/blob/main/assets/command-palette.png?raw=true)
 
 ### Visual Indicators
 
@@ -74,4 +74,4 @@ Historical pages are marked with:
 - Highlighted date headers
 - Subtle shadows for depth
 
-![historical-page](assets/historical-page.png)
+![historical-page](https://github.com/qcrao/last-year-today/blob/main/assets/historical-page.png?raw=true)
