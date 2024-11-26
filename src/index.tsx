@@ -60,8 +60,8 @@ const closeHistoricalPages = async (today: string) => {
       await roamAPI.roamAlphaAPI.ui.rightSidebar.removeWindow({
         window: {
           type: "outline",
-          "block-uid": page.uid
-        }
+          "block-uid": page.uid,
+        },
       });
     } catch (error) {
       console.error(`Failed to close window for page ${page.uid}:`, error);

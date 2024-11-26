@@ -22,7 +22,7 @@ export class HistoricalPagesService {
     const currentDate = DateUtils.parseEnglishDate(currentDateStr);
     const pages: HistoricalPage[] = [];
 
-    for (let i = 1; i < yearsBack; i++) {
+    for (let i = 1; i <= yearsBack; i++) {
       const historicalDate = new Date(currentDate);
       historicalDate.setFullYear(currentDate.getFullYear() - i);
 
