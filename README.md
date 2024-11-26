@@ -2,7 +2,7 @@
 
 Last Year Today is a Roam Research extension that automatically shows you what you wrote on the same day in previous years. It helps you reflect on your past thoughts, track your progress, and rediscover valuable insights from your journal entries.
 
-[Screenshot of historical pages in sidebar with custom styling]
+![historical-pages](assets/historical-pages.png)
 
 ## Features
 
@@ -38,11 +38,11 @@ After installation, configure the extension in the Roam Research settings panel:
    - Default: 1 year
    - Maximum: 10 years
 
-2. **Daily Update Hour**: Set when the historical pages should automatically open
+2. **Hour to Open Last Year Today Page**: Set when the historical pages should automatically open
    - Default: 9 AM
    - Range: 0-23 (24-hour format)
 
-[Screenshot of settings panel]
+![settings](assets/settings.png)
 
 ## Usage
 
@@ -63,7 +63,7 @@ You can also control the extension manually through the command palette (Cmd/Ctr
    - Closes all historical page windows
    - Cleans up the sidebar
 
-[Screenshot of command palette with commands]
+![command-palette](assets/command-palette.png)
 
 ### Visual Indicators
 
@@ -74,4 +74,4 @@ Historical pages are marked with:
 - Highlighted date headers
 - Subtle shadows for depth
 
-[Screenshot of styled historical page]
+![historical-page](assets/historical-page.png)

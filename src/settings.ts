@@ -27,8 +27,8 @@ export function initPanelConfig(extensionAPI: any) {
         },
       },
       {
-        id: "daily-open-last-year-today-hour",
-        name: "Daily Open Last Year Today Page",
+        id: "hour-to-open-last-year-today-page",
+        name: "Hour to Open Last Year Today Page",
         description:
           "Hour of the day to open Last Year Today page (0-23, default: 9)",
         action: {
@@ -39,7 +39,7 @@ export function initPanelConfig(extensionAPI: any) {
               ? 9
               : Math.min(Math.max(value, 0), 23);
             extensionAPI.settings.set(
-              "daily-open-last-year-today-hour",
+              "hour-to-open-last-year-today-page",
               dailyUpdateHour.toString()
             );
             window.dispatchEvent(
