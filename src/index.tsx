@@ -2,11 +2,16 @@
 import { HistoricalPagesService } from "./services/historicalPagesService";
 import { RoamService } from "./services/roamService";
 import { DateUtils } from "./utils/dateUtils";
-import { loadInitialSettings, initPanelConfig, yearsBack } from "./settings";
+import {
+  loadInitialSettings,
+  initPanelConfig,
+  yearsBack,
+  dailyUpdateHour,
+} from "./settings";
 import { loadRoamExtensionCommands } from "./commands";
 
 let cleanupObserver: (() => void) | null = null;
-let midnightTimer: NodeJS.Timer | null = null;
+let updateTimer: NodeJS.Timer | null = null;
 
 const openHistoricalPages = async (today: string) => {
   const historicalPages = await HistoricalPagesService.getHistoricalPages(
@@ -69,23 +74,32 @@ const closeHistoricalPages = async (today: string) => {
   }
 };
 
-const scheduleNextMidnight = () => {
+const scheduleNextUpdate = () => {
   const now = new Date();
-  const tomorrow = new Date(now);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
+  const nextUpdate = new Date(now);
 
-  const timeUntilMidnight = tomorrow.getTime() - now.getTime();
+  // If current hour is before update hour, schedule for today
+  // Otherwise schedule for tomorrow
+  if (now.getHours() < dailyUpdateHour) {
+    nextUpdate.setHours(dailyUpdateHour, 0, 3, 0); // set seconds to 3 to avoid timezone issues
+  } else {
+    nextUpdate.setDate(nextUpdate.getDate() + 1);
+    nextUpdate.setHours(dailyUpdateHour, 0, 3, 0); // set seconds to 3 to avoid timezone issues
+  }
+
+  const timeUntilUpdate = nextUpdate.getTime() - now.getTime();
   console.log(
-    `Next update scheduled in ${timeUntilMidnight / 1000 / 60} minutes`
+    `Next update scheduled in ${Math.round(
+      timeUntilUpdate / 1000 / 60
+    )} minutes`
   );
 
   return setTimeout(async () => {
     const today = DateUtils.formatRoamDate(new Date());
     await openHistoricalPages(today);
-    // Schedule next midnight
-    midnightTimer = scheduleNextMidnight();
-  }, timeUntilMidnight);
+    // Schedule next update
+    updateTimer = scheduleNextUpdate();
+  }, timeUntilUpdate);
 };
 
 const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
@@ -93,7 +107,7 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
 
   try {
     // Load settings
-    await loadInitialSettings(extensionAPI);
+    loadInitialSettings(extensionAPI);
 
     // Initialize panel config
     await extensionAPI.settings.panel.create(initPanelConfig(extensionAPI));
@@ -113,8 +127,8 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
 
     await openHistoricalPages(today);
 
-    // Schedule next midnight update
-    midnightTimer = scheduleNextMidnight();
+    // Schedule next update
+    updateTimer = scheduleNextUpdate();
   } catch (error) {
     console.error("Error loading Last Year Today plugin:", error);
   }
@@ -133,10 +147,10 @@ const onunload = () => {
     cleanupObserver = null;
   }
 
-  // Clear midnight timer
-  if (midnightTimer) {
-    clearTimeout(midnightTimer);
-    midnightTimer = null;
+  // Clear update timer
+  if (updateTimer) {
+    clearTimeout(updateTimer);
+    updateTimer = null;
   }
 
   console.log("Last Year Today plugin unloaded!");
