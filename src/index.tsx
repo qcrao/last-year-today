@@ -112,6 +112,14 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
     // Initialize panel config
     await extensionAPI.settings.panel.create(initPanelConfig(extensionAPI));
 
+    // Listen for settings changes
+    window.addEventListener('lastYearToday:settingsChanged', () => {
+      if (updateTimer) {
+        clearTimeout(updateTimer);
+      }
+      updateTimer = scheduleNextUpdate();
+    });
+
     await loadRoamExtensionCommands(
       extensionAPI,
       openHistoricalPages,
@@ -135,6 +143,9 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
 };
 
 const onunload = () => {
+  // Remove settings change listener
+  window.removeEventListener('lastYearToday:settingsChanged', () => {});
+  
   // Clean up custom styles
   const styleElement = document.getElementById("last-year-today-styles");
   if (styleElement) {
