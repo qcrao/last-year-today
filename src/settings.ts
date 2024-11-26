@@ -27,16 +27,24 @@ export function initPanelConfig(extensionAPI: any) {
         },
       },
       {
-        id: "daily-update-hour",
-        name: "Daily Update Hour",
-        description: "Hour of the day to update (0-23, default: 9)",
+        id: "daily-open-last-year-today-hour",
+        name: "Daily Open Last Year Today Page",
+        description:
+          "Hour of the day to open Last Year Today page (0-23, default: 9)",
         action: {
           type: "input",
           onChange: (evt: any) => {
             const value = parseInt(evt.target.value);
-            dailyUpdateHour = isNaN(value) ? 9 : Math.min(Math.max(value, 0), 23);
-            extensionAPI.settings.set("daily-update-hour", dailyUpdateHour.toString());
-            window.dispatchEvent(new CustomEvent('lastYearToday:settingsChanged'));
+            dailyUpdateHour = isNaN(value)
+              ? 9
+              : Math.min(Math.max(value, 0), 23);
+            extensionAPI.settings.set(
+              "daily-open-last-year-today-hour",
+              dailyUpdateHour.toString()
+            );
+            window.dispatchEvent(
+              new CustomEvent("lastYearToday:settingsChanged")
+            );
           },
         },
       },
