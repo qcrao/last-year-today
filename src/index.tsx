@@ -133,8 +133,6 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
     const now = new Date();
     const today = DateUtils.formatRoamDate(now);
 
-    await openHistoricalPages(today);
-
     // Schedule next update
     updateTimer = scheduleNextUpdate();
   } catch (error) {
