@@ -28,11 +28,19 @@ export function initPanelConfig(extensionAPI: any) {
         action: {
           type: "input",
           onChange: (evt: any) => {
+            console.log("yearsBack onChange", evt);
+            if (!evt?.target?.value) return;
+
             const value = parseInt(evt.target.value);
             yearsBack = isNaN(value)
               ? DEFAULT_YEARS_BACK
               : Math.min(Math.max(value, 1), 10);
-            extensionAPI.settings.set("years-back", yearsBack.toString());
+
+            Promise.resolve(
+              extensionAPI.settings.set("years-back", yearsBack.toString())
+            ).then(() => {
+              console.log("yearsBack settingsChanged to", yearsBack);
+            });
           },
         },
       },
@@ -43,17 +51,26 @@ export function initPanelConfig(extensionAPI: any) {
         action: {
           type: "input",
           onChange: (evt: any) => {
+            console.log("dailyUpdateHour onChange", evt);
+            if (!evt?.target?.value) return;
+
             const value = parseInt(evt.target.value);
             dailyUpdateHour = isNaN(value)
               ? DEFAULT_DAILY_UPDATE_HOUR
               : Math.min(Math.max(value, 0), 23);
-            extensionAPI.settings.set(
-              "hour-to-open-last-year-today-page",
-              dailyUpdateHour.toString()
-            );
-            window.dispatchEvent(
-              new CustomEvent("lastYearToday:settingsChanged")
-            );
+
+            Promise.resolve(
+              extensionAPI.settings.set(
+                "hour-to-open-last-year-today-page",
+                dailyUpdateHour.toString()
+              )
+            ).then(() => {
+              window.dispatchEvent(
+                new CustomEvent(
+                  "lastYearToday:hour-to-open-last-year-today-page:settingsChanged"
+                )
+              );
+            });
           },
         },
       },

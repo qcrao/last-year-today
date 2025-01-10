@@ -116,12 +116,15 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
     await extensionAPI.settings.panel.create(initPanelConfig(extensionAPI));
 
     // Listen for settings changes
-    window.addEventListener("lastYearToday:settingsChanged", () => {
-      if (updateTimer) {
-        clearTimeout(updateTimer);
+    window.addEventListener(
+      "lastYearToday:hour-to-open-last-year-today-page:settingsChanged",
+      () => {
+        if (updateTimer) {
+          clearTimeout(updateTimer);
+        }
+        updateTimer = scheduleNextUpdate();
       }
-      updateTimer = scheduleNextUpdate();
-    });
+    );
 
     await loadRoamExtensionCommands(
       extensionAPI,
@@ -147,7 +150,10 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
 
 const onunload = () => {
   // Remove settings change listener
-  window.removeEventListener("lastYearToday:settingsChanged", () => {});
+  window.removeEventListener(
+    "lastYearToday:hour-to-open-last-year-today-page:settingsChanged",
+    () => {}
+  );
 
   // Clean up custom styles
   const styleElement = document.getElementById("last-year-today-styles");
