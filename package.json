@@ -17,20 +17,6 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
-    "@blueprintjs/core": "^5.15.0",
-    "@blueprintjs/icons": "^5.14.0",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "css-loader": "^7.1.2",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "style-loader": "^4.0.0",
-    "ts-loader": "^9.5.1",
-    "webpack": "^5.96.1",
-    "webpack-cli": "^5.1.4",
-    "axios": "^0.28.1",
-    "js-tiktoken": "^1.0.12",
-    "openai": "^4.19.0",
     "roamjs-scripts": "^0.27.0"
   }
 }
