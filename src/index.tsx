@@ -107,13 +107,16 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
 
   try {
     // Load settings
+    console.log("loadInitialSettings...");
     loadInitialSettings(extensionAPI);
+    console.log("yearsBack", yearsBack);
+    console.log("dailyUpdateHour", dailyUpdateHour);
 
     // Initialize panel config
     await extensionAPI.settings.panel.create(initPanelConfig(extensionAPI));
 
     // Listen for settings changes
-    window.addEventListener('lastYearToday:settingsChanged', () => {
+    window.addEventListener("lastYearToday:settingsChanged", () => {
       if (updateTimer) {
         clearTimeout(updateTimer);
       }
@@ -133,6 +136,8 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
     const now = new Date();
     const today = DateUtils.formatRoamDate(now);
 
+    await openHistoricalPages(today);
+
     // Schedule next update
     updateTimer = scheduleNextUpdate();
   } catch (error) {
@@ -142,8 +147,8 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
 
 const onunload = () => {
   // Remove settings change listener
-  window.removeEventListener('lastYearToday:settingsChanged', () => {});
-  
+  window.removeEventListener("lastYearToday:settingsChanged", () => {});
+
   // Clean up custom styles
   const styleElement = document.getElementById("last-year-today-styles");
   if (styleElement) {
