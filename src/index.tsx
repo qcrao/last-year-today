@@ -5,18 +5,21 @@ import { DateUtils } from "./utils/dateUtils";
 import {
   loadInitialSettings,
   initPanelConfig,
-  yearsBack,
-  dailyUpdateHour,
+  getYearsBack,
+  getDailyUpdateHour,
+  getDailyUpdateMinute,
+  getLastOpenedDate,
+  setLastOpenedDate,
 } from "./settings";
 import { loadRoamExtensionCommands } from "./commands";
 
 let cleanupObserver: (() => void) | null = null;
-let updateTimer: NodeJS.Timer | null = null;
+let checkInterval: ReturnType<typeof setInterval> | null = null;
 
 const openHistoricalPages = async (today: string) => {
   const historicalPages = await HistoricalPagesService.getHistoricalPages(
     today,
-    yearsBack
+    getYearsBack()
   );
 
   if (historicalPages.length > 0) {
@@ -49,7 +52,7 @@ const openHistoricalPages = async (today: string) => {
 const closeHistoricalPages = async (today: string) => {
   const historicalPages = await HistoricalPagesService.getHistoricalPages(
     today,
-    yearsBack
+    getYearsBack()
   );
 
   // Check if rightSidebar API exists before using it
@@ -74,32 +77,45 @@ const closeHistoricalPages = async (today: string) => {
   }
 };
 
-const scheduleNextUpdate = () => {
-  const now = new Date();
-  const nextUpdate = new Date(now);
+const isUpdateTimePassed = (now: Date): boolean => {
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+  const dailyUpdateHour = getDailyUpdateHour();
+  const dailyUpdateMinute = getDailyUpdateMinute();
 
-  // If current hour is before update hour, schedule for today
-  // Otherwise schedule for tomorrow
-  if (now.getHours() < dailyUpdateHour) {
-    nextUpdate.setHours(dailyUpdateHour, 0, 3, 0); // set seconds to 3 to avoid timezone issues
-  } else {
-    nextUpdate.setDate(nextUpdate.getDate() + 1);
-    nextUpdate.setHours(dailyUpdateHour, 0, 3, 0); // set seconds to 3 to avoid timezone issues
+  // Check if current time is past the update time
+  if (currentHour > dailyUpdateHour) {
+    return true;
   }
+  if (currentHour === dailyUpdateHour && currentMinute >= dailyUpdateMinute) {
+    return true;
+  }
+  return false;
+};
 
-  const timeUntilUpdate = nextUpdate.getTime() - now.getTime();
-  console.log(
-    `Next update scheduled in ${Math.round(
-      timeUntilUpdate / 1000 / 60
-    )} minutes`
-  );
+const checkAndOpenHistoricalPages = async () => {
+  const now = new Date();
+  const today = DateUtils.formatRoamDate(now);
+  const lastOpenedDate = getLastOpenedDate();
 
-  return setTimeout(async () => {
-    const today = DateUtils.formatRoamDate(new Date());
+  // Check if it's a new day and past the update time
+  if (today !== lastOpenedDate && isUpdateTimePassed(now)) {
+    console.log(`Opening historical pages for ${today} (time: ${now.getHours()}:${now.getMinutes()}, updateTime: ${getDailyUpdateHour()}:${getDailyUpdateMinute()})`);
+    setLastOpenedDate(today);
     await openHistoricalPages(today);
-    // Schedule next update
-    updateTimer = scheduleNextUpdate();
-  }, timeUntilUpdate);
+  }
+};
+
+const handleVisibilityChange = () => {
+  if (document.visibilityState === "visible") {
+    console.log("Page became visible, checking for updates...");
+    checkAndOpenHistoricalPages();
+  }
+};
+
+const handleWindowFocus = () => {
+  console.log("Window focused, checking for updates...");
+  checkAndOpenHistoricalPages();
 };
 
 const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
@@ -109,22 +125,12 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
     // Load settings
     console.log("loadInitialSettings...");
     loadInitialSettings(extensionAPI);
-    console.log("yearsBack", yearsBack);
-    console.log("dailyUpdateHour", dailyUpdateHour);
+    console.log("yearsBack", getYearsBack());
+    console.log("dailyUpdateHour", getDailyUpdateHour());
+    console.log("dailyUpdateMinute", getDailyUpdateMinute());
 
     // Initialize panel config
     await extensionAPI.settings.panel.create(initPanelConfig(extensionAPI));
-
-    // Listen for settings changes
-    window.addEventListener(
-      "lastYearToday:hour-to-open-last-year-today-page:settingsChanged",
-      () => {
-        if (updateTimer) {
-          clearTimeout(updateTimer);
-        }
-        updateTimer = scheduleNextUpdate();
-      }
-    );
 
     await loadRoamExtensionCommands(
       extensionAPI,
@@ -135,25 +141,56 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
     // Initialize custom styles
     RoamService.injectCustomStyles();
 
-    // Get current date in Roam format
+    // Get current date in Roam format and open historical pages
     const now = new Date();
     const today = DateUtils.formatRoamDate(now);
+    const lastOpenedDate = getLastOpenedDate();
+    const updateTimePassed = isUpdateTimePassed(now);
 
-    await openHistoricalPages(today);
+    console.log(`Checking if should open: today=${today}, lastOpenedDate=${lastOpenedDate}, currentTime=${now.getHours()}:${now.getMinutes()}, updateTime=${getDailyUpdateHour()}:${getDailyUpdateMinute()}`);
 
-    // Schedule next update
-    updateTimer = scheduleNextUpdate();
+    // Only open on load if past the update time and not already opened today
+    if (today !== lastOpenedDate && updateTimePassed) {
+      console.log("Conditions met, opening historical pages...");
+      setLastOpenedDate(today);
+      await openHistoricalPages(today);
+    } else {
+      console.log(`Skipping: today !== lastOpenedDate: ${today !== lastOpenedDate}, updateTimePassed: ${updateTimePassed}`);
+    }
+
+    // Listen for visibility changes to handle tab switching and browser wake
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Listen for window focus (works better in desktop apps)
+    window.addEventListener("focus", handleWindowFocus);
+
+    // Additional events for desktop apps
+    document.addEventListener("focus", () => {
+      console.log("Document focus event triggered");
+      checkAndOpenHistoricalPages();
+    }, true);
+
+    document.addEventListener("click", () => {
+      console.log("Document click - checking for updates...");
+      checkAndOpenHistoricalPages();
+    }, { once: false, capture: true });
+
+    // Backup polling every 1 minute for testing (change back to 30 later)
+    checkInterval = setInterval(() => {
+      console.log("Interval check triggered");
+      checkAndOpenHistoricalPages();
+    }, 60 * 1000);
+
+    console.log("Last Year Today plugin loaded successfully!");
   } catch (error) {
     console.error("Error loading Last Year Today plugin:", error);
   }
 };
 
 const onunload = () => {
-  // Remove settings change listener
-  window.removeEventListener(
-    "lastYearToday:hour-to-open-last-year-today-page:settingsChanged",
-    () => {}
-  );
+  // Remove event listeners
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
+  window.removeEventListener("focus", handleWindowFocus);
 
   // Clean up custom styles
   const styleElement = document.getElementById("last-year-today-styles");
@@ -167,10 +204,10 @@ const onunload = () => {
     cleanupObserver = null;
   }
 
-  // Clear update timer
-  if (updateTimer) {
-    clearTimeout(updateTimer);
-    updateTimer = null;
+  // Clear check interval
+  if (checkInterval) {
+    clearInterval(checkInterval);
+    checkInterval = null;
   }
 
   console.log("Last Year Today plugin unloaded!");

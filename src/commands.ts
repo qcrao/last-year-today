@@ -1,4 +1,5 @@
 import { DateUtils } from "./utils/dateUtils";
+import { setLastOpenedDate } from "./settings";
 
 export const loadRoamExtensionCommands = async (
   extensionAPI: any,
@@ -18,6 +19,15 @@ export const loadRoamExtensionCommands = async (
     callback: async () => {
       const today = DateUtils.formatRoamDate(new Date());
       await closeHistoricalPages(today);
+    },
+  });
+
+  extensionAPI.ui.commandPalette.addCommand({
+    label: "Reset Last Year Today",
+    callback: async () => {
+      setLastOpenedDate(null);
+      extensionAPI.settings.set("last-opened-date", null);
+      console.log("Last Year Today: Reset last-opened-date to null");
     },
   });
 };
