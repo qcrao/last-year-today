@@ -118,6 +118,16 @@ const handleWindowFocus = () => {
   checkAndOpenHistoricalPages();
 };
 
+const handleDocumentFocus = () => {
+  console.log("Document focus event triggered");
+  checkAndOpenHistoricalPages();
+};
+
+const handleDocumentClick = () => {
+  console.log("Document click - checking for updates...");
+  checkAndOpenHistoricalPages();
+};
+
 const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
   console.log("Last Year Today plugin loading...");
 
@@ -165,15 +175,8 @@ const onload = async ({ extensionAPI }: { extensionAPI: any }) => {
     window.addEventListener("focus", handleWindowFocus);
 
     // Additional events for desktop apps
-    document.addEventListener("focus", () => {
-      console.log("Document focus event triggered");
-      checkAndOpenHistoricalPages();
-    }, true);
-
-    document.addEventListener("click", () => {
-      console.log("Document click - checking for updates...");
-      checkAndOpenHistoricalPages();
-    }, { once: false, capture: true });
+    document.addEventListener("focus", handleDocumentFocus, true);
+    document.addEventListener("click", handleDocumentClick, { once: false, capture: true });
 
     // Backup polling every 1 minute for testing (change back to 30 later)
     checkInterval = setInterval(() => {
@@ -191,6 +194,8 @@ const onunload = () => {
   // Remove event listeners
   document.removeEventListener("visibilitychange", handleVisibilityChange);
   window.removeEventListener("focus", handleWindowFocus);
+  document.removeEventListener("focus", handleDocumentFocus, true);
+  document.removeEventListener("click", handleDocumentClick, true);
 
   // Clean up custom styles
   const styleElement = document.getElementById("last-year-today-styles");
